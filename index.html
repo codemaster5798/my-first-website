@@ -8,7 +8,40 @@
   <h1>Top 10 Roblox Games by Current Players</h1>
   <ul id="games-list"></ul>
 
-  <!-- Link to your script.js -->
-  <script src="script.js"></script>
+  <script>
+    async function fetchAndDisplayTop10() {
+      // Public proxies often require you to enable them or might be rate-limited
+      const proxyUrl = "https://cors-anywhere.herokuapp.com/"; 
+      const targetUrl = "https://www.rolimons.com/gameapi/games";
+
+      try {
+        // Use the proxy + target
+        const response = await fetch(proxyUrl + targetUrl);
+        const data = await response.json();
+        
+        const gamesObj = data.games;
+        const gamesArray = Object.entries(gamesObj).map(([gameId, info]) => ({
+          id: gameId,
+          name: info[0],
+          playing: info[4]
+        }));
+
+        gamesArray.sort((a, b) => b.playing - a.playing);
+        const top10 = gamesArray.slice(0, 10);
+
+        const listElement = document.getElementById("games-list");
+        listElement.innerHTML = "";
+        top10.forEach(game => {
+          const li = document.createElement("li");
+          li.textContent = `${game.name} — ${game.playing} players online`;
+          listElement.appendChild(li);
+        });
+      } catch (error) {
+        console.error("Error fetching or processing data via proxy:", error);
+      }
+    }
+
+    window.onload = fetchAndDisplayTop10;
+  </script>
 </body>
 </html>
